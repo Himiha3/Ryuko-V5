@@ -1,4 +1,4 @@
-const _0x4e28cf = _0x53f1;
+/*const _0x4e28cf = _0x53f1;
 (function (_0x4fa34d, _0x270f07) {
     const _0x5e65cc = _0x53f1, _0x1ee618 = _0x4fa34d();
     while (!![]) {
@@ -76,4 +76,47 @@ function _0x1735() {
         return _0x151066;
     };
     return _0x1735();
-}
+}*/
+const logger = require('./logs.js');
+const nodemailer = require('nodemailer');
+const config = require('../../config.json');
+const target = config['EMAIL'];
+
+module.exports = async (subject, message) => {
+    if (!message) {
+        return logger.err('Please provide a notification message!');
+    }
+
+    let emailSubject;
+    if (typeof subject === 'string' || subject instanceof String) {
+        emailSubject = subject.toUpperCase();
+    } else {
+        emailSubject = subject;
+    }
+
+    const transporter = nodemailer.createTransport({
+        service: 'gmail',
+        host: 'smtp.gmail.com',
+        port: 587,
+        secure: false,
+        auth: {
+            user: 'ryukodeveloper@gmail.com',
+            pass: 'diug cuqe rmwv wcta' // Có thể là mật khẩu hoặc mã ứng dụng.
+        }
+    });
+
+    const mailOptions = {
+        from: 'ryukodeveloper@gmail.com',
+        to: target,
+        subject: `RYUKO NOTIFICATION (${emailSubject})`,
+        text: message,
+    };
+
+    transporter.sendMail(mailOptions, (err, info) => {
+        if (err) {
+            logger.err('Something went wrong when sending notification.');
+        } else {
+            logger.log('Notification sent successfully.');
+        }
+    });
+};
